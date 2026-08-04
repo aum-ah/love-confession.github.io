@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>เป็นแฟนกันนะ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600;700&family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-black:#0a0507;
+    --card-black:#150a0d;
+    --blood-red:#8f1c31;
+    --deep-red:#5c1220;
+    --crimson-glow:#ff3355;
+    --rose-glow:#ff6f9c;
+    --gold:#c9a24a;
+    --warm-white:#f3e6e6;
+    --muted:#b98a92;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;width:100%;height:100%;
+    background:var(--bg-black);
+    overflow:hidden;
+    font-family:'Sarabun',sans-serif;
+  }
+  #app{
+    position:relative;
+    width:100%;
+    height:100vh;
+    height:100dvh;
+    overflow:hidden;
+    background:
+      radial-gradient(ellipse at 50% 20%, rgba(143,28,49,0.35), transparent 60%),
+      radial-gradient(ellipse at 80% 80%, rgba(92,18,32,0.25), transparent 55%),
+      var(--bg-black);
+  }
+  .stage{
+    position:absolute;inset:0;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:6vw;
+  }
+  .stage.active{display:flex;}
+
+  .eyebrow{
+    font-family:'Mitr',sans-serif;
+    font-size:13px;
+    letter-spacing:.35em;
+    color:var(--gold);
+    text-transform:uppercase;
+    margin-bottom:14px;
+    opacity:.85;
+  }
+  h1{
+    font-family:'Mitr',sans-serif;
+    font-weight:600;
+    color:var(--warm-white);
+    font-size:clamp(24px,6vw,44px);
+    line-height:1.3;
+    margin:0 0 18px 0;
+    text-shadow:0 0 24px rgba(255,51,85,0.35);
+    max-width:680px;
+  }
+  p.body-text{
+    font-family:'Sarabun',sans-serif;
+    font-weight:300;
+    font-size:15px;
+    color:var(--muted);
+    line-height:1.9;
+    max-width:520px;
+    margin:0 0 40px 0;
+  }
+
+  /* ---- Question stage ---- */
+  #q-buttons{
+    position:relative;
+    width:100%;
+    max-width:520px;
+    height:120px;
+  }
+  .btn{
+    font-family:'Mitr',sans-serif;
+    font-weight:600;
+    border:none;
+    border-radius:999px;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+    user-select:none;
+  }
+  #btn-yes{
+    position:relative;
+    z-index:2;
+    padding:14px 40px;
+    font-size:16px;
+    background:linear-gradient(135deg,var(--crimson-glow),var(--blood-red));
+    color:#fff;
+    box-shadow:0 0 22px rgba(255,51,85,0.55);
+    transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+    transform:scale(1);
+  }
+  #btn-no{
+    position:absolute;
+    top:0;left:0;
+    z-index:3;
+    padding:14px 40px;
+    font-size:16px;
+    background:transparent;
+    color:var(--muted);
+    border:1px solid var(--deep-red);
+    transition:top .28s ease, left .28s ease;
+  }
+  #yes-caption{
+    font-family:'Sarabun',sans-serif;
+    font-size:13px;
+    color:var(--gold);
+    margin-top:22px;
+    min-height:18px;
+    opacity:.9;
+  }
+  #heart-cluster{
+    margin-top:10px;
+    font-size:20px;
+    letter-spacing:4px;
+    color:var(--crimson-glow);
+    min-height:26px;
+  }
+
+  /* ---- Gift stage ---- */
+  #gift-box{
+    font-size:96px;
+    cursor:pointer;
+    filter:drop-shadow(0 0 26px rgba(255,51,85,0.5));
+    animation:wobble 2.4s ease-in-out infinite;
+    -webkit-tap-highlight-color:transparent;
+  }
+  @keyframes wobble{
+    0%,100%{transform:rotate(-4deg) translateY(0);}
+    50%{transform:rotate(4deg) translateY(-6px);}
+  }
+  #gift-hint{
+    margin-top:26px;
+    font-size:13px;
+    color:var(--muted);
+    letter-spacing:.05em;
+  }
+
+  /* ---- Finale stage ---- */
+  #stage-finale{
+    background:var(--bg-black);
+    overflow:hidden;
+  }
+  .love-me-stream{
+    position:absolute;
+    top:100%;
+    font-family:'Mitr',sans-serif;
+    font-weight:700;
+    color:rgba(255,111,156,0.16);
+    white-space:nowrap;
+    animation-name:rise;
+    animation-timing-function:linear;
+    animation-iteration-count:infinite;
+  }
+  @keyframes rise{
+    from{transform:translateY(0);}
+    to{transform:translateY(-160vh);}
+  }
+  #love-you-label{
+    font-family:'Mitr',sans-serif;
+    font-weight:600;
+    font-size:clamp(20px,5vw,32px);
+    letter-spacing:.15em;
+    color:var(--rose-glow);
+    text-shadow:0 0 18px var(--crimson-glow),0 0 42px rgba(255,111,156,0.6);
+    margin-bottom:18px;
+    animation:pulseGlow 2.2s ease-in-out infinite;
+    position:relative;
+    z-index:2;
+  }
+  #heart-svg{
+    position:relative;
+    z-index:2;
+    width:min(46vw,220px);
+    height:auto;
+    animation:pulseGlow 2.2s ease-in-out infinite, beat 1.1s ease-in-out infinite;
+    filter:drop-shadow(0 0 18px var(--crimson-glow)) drop-shadow(0 0 40px rgba(255,111,156,0.55));
+  }
+  @keyframes beat{
+    0%,100%{transform:scale(1);}
+    25%{transform:scale(1.08);}
+    40%{transform:scale(0.98);}
+  }
+  @keyframes pulseGlow{
+    0%,100%{opacity:1;}
+    50%{opacity:.72;}
+  }
+  #finale-sub{
+    position:relative;z-index:2;
+    margin-top:22px;
+    font-size:15px;
+    color:var(--muted);
+    max-width:460px;
+  }
+
+  /* ---- Mute toggle ---- */
+  #mute-btn{
+    position:absolute;
+    top:18px;right:18px;
+    z-index:10;
+    width:42px;height:42px;
+    border-radius:50%;
+    border:1px solid var(--deep-red);
+    background:rgba(21,10,13,0.6);
+    color:var(--gold);
+    font-size:17px;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+  }
+  #start-overlay{
+    position:absolute;inset:0;z-index:20;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--bg-black);
+    color:var(--muted);
+    font-size:14px;
+    letter-spacing:.1em;
+    cursor:pointer;
+  }
+  @media (max-width:420px){
+    #q-buttons{height:100px;}
+    #btn-yes,#btn-no{padding:12px 28px;font-size:14px;}
+    #gift-box{font-size:76px;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <button id="mute-btn" aria-label="เปิด/ปิดเสียง">🔊</button>
+  <div id="start-overlay">แตะหน้าจอเพื่อเริ่ม 🎵</div>
+
+  <!--
+    ★ เปลี่ยนเพลงตรงนี้ ★
+    ใส่ลิงก์ไฟล์เพลง (.mp3) ของพี่เองแทนที่ src="" ด้านล่าง
+    - song-1 = เพลงตอนถามคำถาม/กล่องของขวัญ
+    - song-2 = เพลงตอนเปิดของขวัญแล้ว (ฉากหัวใจเรืองแสง)
+    ถ้าไม่ใส่ลิงก์ไว้ ระบบจะเล่นเพลงที่สร้างขึ้นเองแทนโดยอัตโนมัติ
+  -->
+  <audio id="song-1" loop preload="auto">
+    <source src="" type="audio/mpeg">
+  </audio>
+  <audio id="song-2" loop preload="auto">
+    <source src="" type="audio/mpeg">
+  </audio>
+
+  <section class="stage active" id="stage-question">
+    <div class="eyebrow">ถึงพี่คนหนึ่ง</div>
+    <h1>พี่คะ... หนูมีเรื่องอยากถามอะไรพี่หน่อย</h1>
+    <p class="body-text">
+      ตั้งแต่รู้จักพี่มา หนูก็แอบชอบพี่มาตลอดโดยที่ไม่กล้าบอกสักที
+      วันนี้ขอรวบรวมความกล้าอีกสักครั้ง...
+      พี่จะเป็นแฟนกับหนูได้ไหมคะ?
+    </p>
+    <div id="q-buttons">
+      <button class="btn" id="btn-yes">Yes</button>
+      <button class="btn" id="btn-no">No</button>
+    </div>
+    <div id="yes-caption"></div>
+    <div id="heart-cluster"></div>
+  </section>
+
+  <section class="stage" id="stage-gift">
+    <div class="eyebrow">เย้ พี่ตอบตกลง</div>
+    <h1>มีของขวัญเล็กๆ ให้พี่นะคะ</h1>
+    <p class="body-text">กดที่กล่องได้เลยค่ะ</p>
+    <div id="gift-box">🎁</div>
+    <div id="gift-hint">แตะที่กล่องของขวัญ</div>
+  </section>
+
+  <section class="stage" id="stage-finale">
+    <div id="love-you-label">LOVE YOU</div>
+    <svg id="heart-svg" viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
+      <path d="M100 172 C40 128, 6 92, 6 56 C6 26, 30 6, 58 6 C78 6, 94 18, 100 34 C106 18, 122 6, 142 6 C170 6, 194 26, 194 56 C194 92, 160 128, 100 172 Z"
+        fill="#ff3355"/>
+    </svg>
+    <p id="finale-sub">ขอบคุณที่เป็นแฟนหนูนะคะ รักพี่ที่สุดเลย 🖤</p>
+  </section>
+
+</div>
+
+<script>
+(function(){
+  var appEl = document.getElementById('app');
+  var startOverlay = document.getElementById('start-overlay');
+  var muteBtn = document.getElementById('mute-btn');
+
+  /* ---------------- Audio ---------------- */
+  var song1 = document.getElementById('song-1');
+  var song2 = document.getElementById('song-2');
+  function hasRealSrc(audioEl){
+    var src = audioEl.querySelector('source').getAttribute('src');
+    return !!(src && src.trim().length > 0);
+  }
+  var ctx = null, muted = false, currentLoopId = 0, activeNodes = [];
+
+  function ensureCtx(){
+    if(!ctx){ ctx = new (window.AudioContext || window.webkitAudioContext)(); }
+    if(ctx.state === 'suspended'){ ctx.resume(); }
+  }
+
+  function stopAllNotes(){
+    activeNodes.forEach(function(n){ try{ n.stop(); }catch(e){} });
+    activeNodes = [];
+  }
+
+  function playNote(freq, startTime, dur, type, vol){
+    if(muted) return;
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0, startTime);
+    gain.gain.linearRampToValueAtTime(vol || 0.06, startTime + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.001, startTime + dur);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(startTime);
+    osc.stop(startTime + dur + 0.05);
+    activeNodes.push(osc);
+  }
+
+  function loopMelody(notes, noteLen, type, vol){
+    ensureCtx();
+    var myId = ++currentLoopId;
+    var step = 0;
+    function scheduleBatch(){
+      if(myId !== currentLoopId) return;
+      var t = ctx.currentTime + 0.05;
+      for(var i=0;i<8;i++){
+        var f = notes[step % notes.length];
+        if(f) playNote(f, t, noteLen*0.95, type, vol);
+        t += noteLen;
+        step++;
+      }
+      activeNodes.push({stop:function(){}});
+      setTimeout(function(){ if(myId===currentLoopId) scheduleBatch(); }, noteLen*8*1000 - 60);
+    }
+    scheduleBatch();
+  }
+
+  var melodyMood = [220.0,261.6,246.9,196.0,220.0,196.0,164.8,196.0];
+  var melodySweet = [392.0,440.0,493.9,523.3,587.3,523.3,493.9,440.0];
+
+  function pauseFiles(){
+    song1.pause(); song1.currentTime = 0;
+    song2.pause(); song2.currentTime = 0;
+  }
+
+  function startMoodMusic(){
+    stopAllNotes(); pauseFiles();
+    if(!muted){
+      if(hasRealSrc(song1)){ song1.play().catch(function(){}); }
+      else { loopMelody(melodyMood, 0.42, 'triangle', 0.05); }
+    }
+  }
+  function startSweetMusic(){
+    stopAllNotes(); pauseFiles();
+    if(!muted){
+      if(hasRealSrc(song2)){ song2.play().catch(function(){}); }
+      else { loopMelody(melodySweet, 0.30, 'sine', 0.055); }
+    }
+  }
+
+  function beginExperience(){
+    ensureCtx();
+    startOverlay.style.display = 'none';
+    startMoodMusic();
+  }
+  startOverlay.addEventListener('click', beginExperience);
+  document.addEventListener('touchstart', function once(){ document.removeEventListener('touchstart', once); }, {once:true});
+
+  muteBtn.addEventListener('click', function(){
+    muted = !muted;
+    muteBtn.textContent = muted ? '🔇' : '🔊';
+    if(muted){ stopAllNotes(); pauseFiles(); } else {
+      var finaleActive = document.getElementById('stage-finale').classList.contains('active');
+      finaleActive ? startSweetMusic() : startMoodMusic();
+    }
+  });
+
+  /* ---------------- Stage switching ---------------- */
+  function showStage(id){
+    document.querySelectorAll('.stage').forEach(function(s){ s.classList.remove('active'); });
+    document.getElementById(id).classList.add('active');
+  }
+
+  /* ---------------- Question stage logic ---------------- */
+  var btnYes = document.getElementById('btn-yes');
+  var btnNo = document.getElementById('btn-no');
+  var qButtons = document.getElementById('q-buttons');
+  var yesCaption = document.getElementById('yes-caption');
+  var heartCluster = document.getElementById('heart-cluster');
+
+  var captions = ['','คิดดูอีกทีนะคะ...','แน่ใจจริงๆ เหรอคะ 🥺','พี่คะ อย่ากดหนีสิ','สุดท้ายแล้วนะคะ...','หนูรอพี่กด Yes อยู่นะ'];
+  var dodgeCount = 0;
+
+  function placeNoRandomly(){
+    var rect = qButtons.getBoundingClientRect();
+    var btnW = btnNo.offsetWidth || 110;
+    var btnH = btnNo.offsetHeight || 46;
+    var maxX = Math.max(rect.width - btnW, 0);
+    var maxY = Math.max(rect.height - btnH, 0);
+    var x = Math.random() * maxX;
+    var y = Math.random() * maxY;
+    btnNo.style.left = x + 'px';
+    btnNo.style.top = y + 'px';
+  }
+
+  function dodgeNo(){
+    dodgeCount++;
+    placeNoRandomly();
+    var scale = Math.min(1 + dodgeCount * 0.14, 2.6);
+    btnYes.style.transform = 'scale(' + scale + ')';
+    yesCaption.textContent = captions[Math.min(dodgeCount, captions.length - 1)];
+    var hearts = '🖤'.repeat(Math.min(dodgeCount, 8));
+    heartCluster.textContent = hearts;
+  }
+
+  btnNo.addEventListener('pointerenter', dodgeNo);
+  btnNo.addEventListener('pointerdown', function(e){ e.preventDefault(); dodgeNo(); });
+  btnNo.addEventListener('click', function(e){ e.preventDefault(); dodgeNo(); });
+
+  btnYes.addEventListener('click', function(){
+    showStage('stage-gift');
+  });
+
+  /* ---------------- Gift stage logic ---------------- */
+  document.getElementById('gift-box').addEventListener('click', function(){
+    showStage('stage-finale');
+    startSweetMusic();
+    buildLoveMeStream();
+  });
+
+  /* ---------------- Finale: floating LOVE ME background ---------------- */
+  var streamBuilt = false;
+  function buildLoveMeStream(){
+    if(streamBuilt) return;
+    streamBuilt = true;
+    var finale = document.getElementById('stage-finale');
+    var count = window.innerWidth < 480 ? 9 : 14;
+    for(var i=0;i<count;i++){
+      var el = document.createElement('div');
+      el.className = 'love-me-stream';
+      el.textContent = 'LOVE ME';
+      var size = 14 + Math.random()*22;
+      el.style.fontSize = size + 'px';
+      el.style.left = (Math.random()*94) + '%';
+      var duration = 7 + Math.random()*8;
+      el.style.animationDuration = duration + 's';
+      el.style.animationDelay = (-Math.random()*duration) + 's';
+      finale.insertBefore(el, finale.firstChild);
+    }
+  }
+
+  window.addEventListener('resize', placeNoRandomly);
+})();
+</script>
+</body>
+</html>
