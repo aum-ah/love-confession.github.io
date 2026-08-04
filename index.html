@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>มีเรื่องอยากบอก...</title>
+  <meta property="og:title" content="...">
+  <meta property="og:description" content="...">
+  <meta property="og:image" content="...">
+  <meta name="description" content="...">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500&family=Mitr:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #dde8f5;
+      font-family: 'Sarabun', sans-serif;
+      padding: 1rem;
+      overflow: hidden;
+    }
+ 
+    /* Soft floating blobs */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::before {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(120,170,230,0.35) 0%, transparent 70%);
+      top: -100px; left: -100px;
+      animation: driftA 12s ease-in-out infinite alternate;
+    }
+    body::after {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(180,210,245,0.4) 0%, transparent 70%);
+      bottom: -80px; right: -80px;
+      animation: driftB 14s ease-in-out infinite alternate;
+    }
+ 
+    @keyframes driftA { from { transform: translate(0,0); } to { transform: translate(40px, 30px); } }
+    @keyframes driftB { from { transform: translate(0,0); } to { transform: translate(-30px, -40px); } }
+ 
+    .card {
+      position: relative;
+      z-index: 1;
+      background: rgba(255,255,255,0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.9);
+      border-radius: 28px;
+      padding: 2.8rem 2.2rem 2.2rem;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 8px 40px rgba(40, 90, 160, 0.1), 0 1px 0 rgba(255,255,255,0.8) inset;
+      animation: riseUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+ 
+    @keyframes riseUp {
+      from { opacity: 0; transform: translateY(30px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+ 
+    @keyframes floatHeart {
+      0%, 100% { transform: translateY(0) scale(1); }
+      45%       { transform: translateY(-10px) scale(1.05); }
+    }
+ 
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      30%       { transform: scale(1.18); }
+      60%       { transform: scale(1.05); }
+    }
+ 
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+ 
+    @keyframes confettiFall {
+      0%   { transform: translateY(0) rotate(0deg) scale(1);   opacity: 1; }
+      80%  { opacity: 1; }
+      100% { transform: translateY(380px) rotate(800deg) scale(0.5); opacity: 0; }
+    }
+ 
+    .heart-icon {
+      font-size: 60px;
+      display: block;
+      margin-bottom: 1.1rem;
+      animation: floatHeart 3.5s ease-in-out infinite, pulse 1.8s ease-in-out infinite;
+      filter: drop-shadow(0 0 16px rgba(56,138,220,0.4));
+      line-height: 1;
+    }
+ 
+    .pill {
+      display: inline-block;
+      background: rgba(56,138,220,0.1);
+      color: #1659a0;
+      font-size: 11.5px;
+      font-weight: 400;
+      padding: 4px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(56,138,220,0.2);
+      margin-bottom: 1.2rem;
+      letter-spacing: 0.04em;
+    }
+ 
+    .main-title {
+      font-family: 'Mitr', sans-serif;
+      font-size: 24px;
+      font-weight: 400;
+      color: #0b3f78;
+      margin-bottom: 0.6rem;
+      line-height: 1.3;
+    }
+ 
+    .sub-text {
+      font-size: 14.5px;
+      color: #3782cc;
+      line-height: 1.9;
+      margin-bottom: 1.8rem;
+    }
+ 
+    .sub-text .small {
+      font-size: 12.5px;
+      color: #185fa5;
+      opacity: 0.85;
+    }
+ 
+    .big-q {
+      font-family: 'Mitr', sans-serif;
+      font-size: 20px;
+      color: #0b3f78;
+      margin-top: 0.4rem;
+      display: block;
+    }
+ 
+    .btn-yes {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      border-radius: 16px;
+      border: none;
+      background: linear-gradient(135deg, #4a9ae4 0%, #185fa5 100%);
+      color: #fff;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-bottom: 14px;
+      letter-spacing: 0.03em;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 18px rgba(24,95,165,0.28);
+    }
+    .btn-yes:hover  { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(24,95,165,0.38); }
+    .btn-yes:active { transform: scale(0.97); }
+ 
+    /* The runaway button — fixed position so it can escape anywhere */
+    .btn-no {
+      position: fixed;
+      padding: 15px 26px;
+      border-radius: 16px;
+      border: 1.5px solid rgba(56,138,220,0.35);
+      background: rgba(255,255,255,0.92);
+      color: #185fa5;
+      font-family: 'Sarabun', sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      letter-spacing: 0.03em;
+      z-index: 999;
+      white-space: nowrap;
+      transition: background 0.1s;
+      box-shadow: 0 2px 12px rgba(24,95,165,0.1);
+    }
+ 
+    .hint {
+      font-size: 12px;
+      color: #96bde8;
+      margin-top: 1rem;
+    }
+ 
+    /* Results */
+    .result {
+      display: none;
+      animation: fadeSlide 0.5s ease-out both;
+    }
+    .result-emoji { font-size: 54px; display: block; margin-bottom: 0.8rem; }
+    .result-title {
+      font-family: 'Mitr', sans-serif;
+      font-size: 23px; font-weight: 400;
+      color: #0b3f78; margin-bottom: 0.5rem;
+    }
+    .result-sub { font-size: 14px; color: #3782cc; line-height: 1.85; margin-bottom: 1.6rem; }
+    .reset-btn {
+      font-size: 13px; color: #5a9fd4;
+      background: none; border: none;
+      cursor: pointer; text-decoration: underline;
+      font-family: 'Sarabun', sans-serif;
+    }
+ 
+    /* Confetti */
+    .confetti-piece {
+      position: fixed;
+      width: 9px; height: 9px;
+      pointer-events: none;
+      z-index: 9999;
+      animation: confettiFall 2s ease-in forwards;
+    }
+  </style>
+</head>
+<body>
+ 
+<div class="card">
+  <!-- Question -->
+  <div id="question-section">
+    <span class="heart-icon">💙</span>
+    <span class="pill"> มีเรื่องอยากบอก</span>
+    <h1 class="main-title">Hi พี่กระต่าย</h1>
+    <p class="sub-text">
+      พี่ก็รู้แหละว่าเราคิดมากกว่านี้<br>
+      <span class="small">ไหนๆล่ะ คุยกันมาสักพักแล้วนะ เราจำได้พี่ว่าเราคุยกับพี่<br>
+        ครั้งแรกวันที่ 1 เมษายน ตอนนี้มันก็ผ่านสักพักแล้ว<br>
+        ก็มีเรื่องอยากจะถามพี่จริงๆนะ</span>
+      <span class="big-q">เป็นแฟนกันมั้ย 💙</span>
+      
+    </p>
+    <button class="btn-yes" onclick="handleYes()">💙 เป็น</button>
+    <div style="height:56px;"></div>
+    <p class="hint">คิดดี ๆ ก่อนตอบนะคะ 🌊</p>
+  </div>
+ 
+  <!-- Yes result -->
+  <div class="result" id="yes-result">
+    <span class="result-emoji">🥹💙</span>
+    <h2 class="result-title">จริงนะ!</h2>
+    <p class="result-sub">
+      เย่ จีบพี่ติดแล้วสินะ น่ารักที่สุดเลยย 💙<br>
+      ดีใจจริงนะเนี่ยยย ถ้างั้นน<br>
+      เราจะไม่ดื้อกับพี่นะคะ จะดูแลอย่างดีเลยยย<br>
+      อยู่ให้เรารักไปนานๆนะ 
+    </p>
+    <button class="reset-btn" onclick="resetAll()">← กลับไปหน้าแรก</button>
+  </div>
+ 
+  <!-- No result -->
+  <div class="result" id="no-result">
+    <h2 class="result-title">เชอะ!</h2>
+    <p class="result-sub">
+      ไม่ให้ปฎิเสธหรอก ไม่ยอมหรอก<br> 
+      ถ้าจะปฎิเสธอยู่นะ จะจีบจนกว่าจะติดอ่ะ<br>  
+    </p>
+    <button class="reset-btn" onclick="resetAll()">← กลับไปหน้าแรก</button>
+  </div>
+</div>
+ 
+<!-- Runaway "No" button -->
+<button class="btn-no" id="no-btn" onclick="handleNoClick()">ไม่เป็น</button>
+ 
+<script>
+  const colors = ['#378ADD','#85B7EB','#B5D4F4','#185FA5','#ddeeff','#0C447C'];
+  let noCount = 0;
+  const noBtn = document.getElementById('no-btn');
+  const messages = ['ไม่เป็น 🥺','คิดอีกทีสิ','เฮ้ย! ยังจะกดอีก','ก็ได้ๆ เซ้าซี้จัง'];
+ 
+  /* Place button initially below the yes-button area */
+  function initBtn() {
+    const card = document.querySelector('.card');
+    const r = card.getBoundingClientRect();
+    noBtn.style.left = (r.left + r.width/2 - noBtn.offsetWidth/2) + 'px';
+    noBtn.style.top  = (r.top + r.height - 80) + 'px';
+  }
+ 
+  /* Move button to a random spot away from the card */
+  function flee() {
+    const bw = noBtn.offsetWidth  || 120;
+    const bh = noBtn.offsetHeight || 52;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const card = document.querySelector('.card');
+    const r = card.getBoundingClientRect();
+    const margin = 24;
+ 
+    let x, y, attempts = 0;
+    do {
+      x = margin + Math.random() * (vw - bw - margin * 2);
+      y = margin + Math.random() * (vh - bh - margin * 2);
+      attempts++;
+    } while (
+      attempts < 40 &&
+      x < r.right + 30 && x + bw > r.left - 30 &&
+      y < r.bottom + 30 && y + bh > r.top - 30
+    );
+ 
+    noBtn.style.left = x + 'px';
+    noBtn.style.top  = y + 'px';
+  }
+ 
+  window.addEventListener('load', () => setTimeout(initBtn, 120));
+ 
+  /* Flee on hover (desktop) */
+  noBtn.addEventListener('mouseenter', flee);
+ 
+  /* Flee on touch move (mobile) */
+  noBtn.addEventListener('touchmove', e => { e.preventDefault(); flee(); }, { passive: false });
+  noBtn.addEventListener('touchstart', e => { e.preventDefault(); flee(); handleNoClick(); }, { passive: false });
+ 
+  function handleNoClick() {
+    noCount++;
+    if (noCount < 4) {
+      noBtn.textContent = messages[noCount];
+    } else {
+      noBtn.style.display = 'none';
+      document.getElementById('question-section').style.display = 'none';
+      document.getElementById('no-result').style.display = 'block';
+    }
+  }
+ 
+  function spawnConfetti() {
+    for (let i = 0; i < 32; i++) {
+      const el = document.createElement('div');
+      el.className = 'confetti-piece';
+      el.style.left = (10 + Math.random() * (window.innerWidth - 20)) + 'px';
+      el.style.top  = (Math.random() * window.innerHeight * 0.3) + 'px';
+      el.style.background = colors[Math.floor(Math.random() * colors.length)];
+      el.style.animationDelay = (Math.random() * 0.8) + 's';
+      el.style.borderRadius = Math.random() > 0.45 ? '50%' : '3px';
+      el.style.transform = `rotate(${Math.random()*360}deg)`;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 2800);
+    }
+  }
+ 
+  function handleYes() {
+    spawnConfetti();
+    setTimeout(() => {
+      noBtn.style.display = 'none';
+      document.getElementById('question-section').style.display = 'none';
+      document.getElementById('yes-result').style.display = 'block';
+    }, 450);
+  }
+ 
+  function resetAll() {
+    noCount = 0;
+    noBtn.textContent = 'ไม่เป็น';
+    noBtn.style.display = 'block';
+    document.getElementById('question-section').style.display = 'block';
+    document.getElementById('yes-result').style.display  = 'none';
+    document.getElementById('no-result').style.display   = 'none';
+    setTimeout(initBtn, 60);
+  }
+</script>
+</body>
+</html>
