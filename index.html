@@ -230,6 +230,14 @@
     letter-spacing:.1em;
     cursor:pointer;
   }
+  /* คอนเทนเนอร์ซ่อนสำหรับเล่นเพลงจาก YouTube (มองไม่เห็น แต่ต้องไม่ display:none) */
+  .yt-hidden{
+    position:fixed;
+    width:2px;height:2px;
+    left:-9999px;top:-9999px;
+    opacity:0;
+    pointer-events:none;
+  }
   @media (max-width:420px){
     #q-buttons{height:100px;}
     #btn-yes,#btn-no{padding:12px 28px;font-size:14px;}
@@ -245,17 +253,12 @@
 
   <!--
     ★ เปลี่ยนเพลงตรงนี้ ★
-    ใส่ลิงก์ไฟล์เพลง (.mp3) ของพี่เองแทนที่ src="" ด้านล่าง
-    - song-1 = เพลงตอนถามคำถาม/กล่องของขวัญ
-    - song-2 = เพลงตอนเปิดของขวัญแล้ว (ฉากหัวใจเรืองแสง)
-    ถ้าไม่ใส่ลิงก์ไว้ ระบบจะเล่นเพลงที่สร้างขึ้นเองแทนโดยอัตโนมัติ
+    เอา VIDEO ID จากลิงก์ YouTube มาใส่ (ไม่ใช่ลิงก์เต็ม)
+    เช่น youtube.com/watch?v=xsSsRMwWTx0  ->  VIDEO ID คือ xsSsRMwWTx0
+    ytStart คือวินาทีที่ให้เริ่มเล่น (ใส่ 0 ถ้าอยากเริ่มตั้งแต่ต้น)
   -->
-  <audio id="song-1" loop preload="auto">
-    <source src="https://www.youtube.com/embed/xsSsRMwWTx0?si=9Mj1J_UOSWTtDs0O&amp;start=6" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" type="audio/mpeg">
-  </audio>
-  <audio id="song-2" loop preload="auto">
-    <source src="https://www.youtube.com/embed/g5qU7p7yOY8?si=lRHA7AFFfA2fxhyT&amp;start=140" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" type="audio/mpeg">
-  </audio>
+  <div id="yt-player-1" class="yt-hidden"></div>
+  <div id="yt-player-2" class="yt-hidden"></div>
 
   <section class="stage active" id="stage-question">
     <div class="eyebrow">ถึงพี่คนหนึ่ง</div>
@@ -293,30 +296,28 @@
 </div>
 
 <script>
+  // ★★★ ตั้งค่าเพลงตรงนี้ ★★★
+  var SONG_1_ID = 'https://www.youtube.com/embed/j4-hDSUtql8?si=j2y6RpEK0wLPLpka&amp;start=39';   // เพลงตอนถามคำถาม / กล่องของขวัญ
+  var SONG_1_START = 0:39;
+  var SONG_2_ID = 'https://www.youtube.com/embed/g5qU7p7yOY8?si=jynTxzcqNbo7TpDO&amp;start=140';   // เพลงตอนหัวใจเรืองแสง (ฉากจบ)
+  var SONG_2_START = 2:20;
+</script>
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
 (function(){
-  var appEl = document.getElementById('app');
   var startOverlay = document.getElementById('start-overlay');
   var muteBtn = document.getElementById('mute-btn');
 
-  /* ---------------- Audio ---------------- */
-  var song1 = document.getElementById('song-1');
-  var song2 = document.getElementById('song-2');
-  function hasRealSrc(audioEl){
-    var src = audioEl.querySelector('source').getAttribute('src');
-    return !!(src && src.trim().length > 0);
-  }
-  var ctx = null, muted = false, currentLoopId = 0, activeNodes = [];
-
+  /* ---------------- เพลงสำรอง สังเคราะห์เอง (เผื่อ YouTube โหลดไม่ได้) ---------------- */
+  var ctx = null, currentLoopId = 0, activeNodes = [];
   function ensureCtx(){
     if(!ctx){ ctx = new (window.AudioContext || window.webkitAudioContext)(); }
     if(ctx.state === 'suspended'){ ctx.resume(); }
   }
-
   function stopAllNotes(){
     activeNodes.forEach(function(n){ try{ n.stop(); }catch(e){} });
     activeNodes = [];
   }
-
   function playNote(freq, startTime, dur, type, vol){
     if(muted) return;
     var osc = ctx.createOscillator();
@@ -331,7 +332,6 @@
     osc.stop(startTime + dur + 0.05);
     activeNodes.push(osc);
   }
-
   function loopMelody(notes, noteLen, type, vol){
     ensureCtx();
     var myId = ++currentLoopId;
@@ -345,34 +345,62 @@
         t += noteLen;
         step++;
       }
-      activeNodes.push({stop:function(){}});
       setTimeout(function(){ if(myId===currentLoopId) scheduleBatch(); }, noteLen*8*1000 - 60);
     }
     scheduleBatch();
   }
-
   var melodyMood = [220.0,261.6,246.9,196.0,220.0,196.0,164.8,196.0];
   var melodySweet = [392.0,440.0,493.9,523.3,587.3,523.3,493.9,440.0];
 
-  function pauseFiles(){
-    song1.pause(); song1.currentTime = 0;
-    song2.pause(); song2.currentTime = 0;
+  /* ---------------- YouTube IFrame API (เล่นเพลงจริงจากลิงก์ YouTube) ---------------- */
+  var player1 = null, player2 = null;
+  var p1ready = false, p2ready = false;
+  var ytBlocked = false;
+  var wantPlay = null; // 'mood' | 'sweet' | null
+  var muted = false;
+
+  window.onYouTubeIframeAPIReady = function(){
+    player1 = new YT.Player('yt-player-1', {
+      videoId: SONG_1_ID,
+      playerVars: { autoplay:0, controls:0, start:SONG_1_START, playlist:SONG_1_ID, loop:1, disablekb:1, modestbranding:1, rel:0 },
+      events: { onReady:function(){ p1ready = true; tryPlayWanted(); } }
+    });
+    player2 = new YT.Player('yt-player-2', {
+      videoId: SONG_2_ID,
+      playerVars: { autoplay:0, controls:0, start:SONG_2_START, playlist:SONG_2_ID, loop:1, disablekb:1, modestbranding:1, rel:0 },
+      events: { onReady:function(){ p2ready = true; tryPlayWanted(); } }
+    });
+  };
+  // ถ้าโหลด YouTube API ไม่ได้ภายใน 4 วิ (โดนบล็อก/เน็ตช้า) ให้ใช้เพลงสำรองแทน
+  setTimeout(function(){
+    if(typeof YT === 'undefined' || !YT.Player){ ytBlocked = true; tryPlayWanted(); }
+  }, 4000);
+
+  function pauseAllYT(){
+    if(player1 && player1.pauseVideo) player1.pauseVideo();
+    if(player2 && player2.pauseVideo) player2.pauseVideo();
   }
 
-  function startMoodMusic(){
-    stopAllNotes(); pauseFiles();
-    if(!muted){
-      if(hasRealSrc(song1)){ song1.play().catch(function(){}); }
-      else { loopMelody(melodyMood, 0.42, 'triangle', 0.05); }
+  function tryPlayWanted(){
+    if(muted || !wantPlay) return;
+    if(ytBlocked){
+      stopAllNotes();
+      if(wantPlay === 'mood') loopMelody(melodyMood, 0.42, 'triangle', 0.05);
+      if(wantPlay === 'sweet') loopMelody(melodySweet, 0.30, 'sine', 0.055);
+      return;
+    }
+    if(wantPlay === 'mood' && p1ready){
+      if(player2 && player2.pauseVideo) player2.pauseVideo();
+      player1.playVideo();
+    }
+    if(wantPlay === 'sweet' && p2ready){
+      if(player1 && player1.pauseVideo) player1.pauseVideo();
+      player2.playVideo();
     }
   }
-  function startSweetMusic(){
-    stopAllNotes(); pauseFiles();
-    if(!muted){
-      if(hasRealSrc(song2)){ song2.play().catch(function(){}); }
-      else { loopMelody(melodySweet, 0.30, 'sine', 0.055); }
-    }
-  }
+
+  function startMoodMusic(){ stopAllNotes(); wantPlay = 'mood'; if(!muted) tryPlayWanted(); }
+  function startSweetMusic(){ stopAllNotes(); wantPlay = 'sweet'; if(!muted) tryPlayWanted(); }
 
   function beginExperience(){
     ensureCtx();
@@ -385,10 +413,8 @@
   muteBtn.addEventListener('click', function(){
     muted = !muted;
     muteBtn.textContent = muted ? '🔇' : '🔊';
-    if(muted){ stopAllNotes(); pauseFiles(); } else {
-      var finaleActive = document.getElementById('stage-finale').classList.contains('active');
-      finaleActive ? startSweetMusic() : startMoodMusic();
-    }
+    if(muted){ stopAllNotes(); pauseAllYT(); }
+    else { tryPlayWanted(); }
   });
 
   /* ---------------- Stage switching ---------------- */
